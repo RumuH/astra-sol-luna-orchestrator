@@ -1,0 +1,4 @@
+interface:
+  display_name: "Astra–Sol–Luna Orchestrator"
+  short_description: "Dynamic multi-model project routing and review"
+  default_prompt: "Use $astra-sol-luna-orchestrator to complete this project with dynamic Sol/Luna routing and Astra review."
