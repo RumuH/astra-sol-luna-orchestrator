@@ -49,10 +49,11 @@ Keep architecture, security-critical decisions, destructive-operation decisions,
 1. For a complex project, publish and maintain a compact plan containing `PROJECT GOAL`, `CONSTRAINTS`, `ARCHITECTURE`, `TASK GRAPH`, `DEPENDENCIES`, `RISK LEVEL`, `MODEL ASSIGNMENT`, and `ACCEPTANCE CRITERIA`.
 2. Route each READY task using the factors in `routing.md`, prioritizing verification quality over raw task size.
 3. Give each worker exactly one bounded objective using the contract in `workflow.md`.
-4. Parallelize only independent tasks. With a shared checkout, give writing workers disjoint file ownership; otherwise serialize or isolate them.
-5. Inspect evidence yourself. A worker's completion statement is never acceptance.
-6. Rework, escalate, downgrade, or replan according to the failure cause—not merely because a worker failed once.
-7. Continue without asking after every small task. Pause only for material ambiguity, destructive or irreversible choices needing authorization, missing credentials, a real blocker, or a user-requested checkpoint.
+4. Maintain the dispatch ledger defined in `workflow.md`. Record the explicit spawn model and reasoning effort for every attempt, including failures, retries, escalation, and downgrade.
+5. Parallelize only independent tasks. With a shared checkout, give writing workers disjoint file ownership; otherwise serialize or isolate them.
+6. Inspect evidence yourself. A worker's completion statement is never acceptance.
+7. Rework, escalate, downgrade, or replan according to the failure cause—not merely because a worker failed once.
+8. Continue without asking after every small task. Pause only for material ambiguity, destructive or irreversible choices needing authorization, missing credentials, a real blocker, or a user-requested checkpoint.
 
 ## Project-local overrides
 
@@ -62,4 +63,4 @@ If no budget mode is specified, use `NORMAL`.
 
 ## Completion
 
-Return a single integrated report from the main thread using the final-report structure in `workflow.md`. Include meaningful worker usage and validation evidence, not verbose agent transcripts.
+Return a single integrated report from the main thread using the final-report structure in `workflow.md`. Its `Agent usage` section must map every delegated subtask attempt to the worker model and reasoning effort recorded from the accepted spawn or follow-up request. Include validation evidence, not verbose agent transcripts or hidden reasoning.

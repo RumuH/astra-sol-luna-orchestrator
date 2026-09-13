@@ -10,6 +10,7 @@ A reusable Codex Skill for main-thread orchestration with dynamic routing betwee
 - Escalates Luna to Sol, or Sol Medium to Sol High, only after classifying the failure.
 - Limits orchestration to a depth-1 star topology, three concurrent workers, and two review rounds per task.
 - Requires explicit worker contracts and evidence-based acceptance.
+- Reports every worker attempt with the exact dispatched model, reasoning effort, result, and validation evidence.
 
 ## Install
 
