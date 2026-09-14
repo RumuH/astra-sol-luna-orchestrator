@@ -1,16 +1,18 @@
 # Astra–Sol–Luna Orchestrator
 
-A reusable Codex Skill for main-thread orchestration with dynamic routing between GPT-5.6 Sol and GPT-5.6 Luna workers.
+A reusable Codex Skill for main-thread orchestration with dynamic routing between GPT-6 Astra, GPT-5.6 Sol, and GPT-5.6 Luna workers.
 
 ## Highlights
 
 - Keeps architecture, important decisions, review, and final acceptance in the main thread.
 - Routes work by reasoning difficulty, risk, reversibility, and verification quality rather than code volume alone.
+- Runs under any capable main-thread model; an Astra main thread is preferred when selected, but is not required.
+- Caps automatically selected Astra and Sol reasoning at `medium`; Luna may use `high` only for difficult, bounded, strongly verifiable work.
 - Supports `NORMAL`, `CONSERVATIVE`, and `LOW_BUDGET` modes.
-- Escalates Luna to Sol, or Sol Medium to Sol High, only after classifying the failure.
+- Escalates only after classifying the failure, and returns expensive-model failures to main-thread replanning instead of automatically raising effort above `medium`.
 - Limits orchestration to a depth-1 star topology, three concurrent workers, and two review rounds per task.
 - Requires explicit worker contracts and evidence-based acceptance.
-- Reports every worker attempt with the exact dispatched model, reasoning effort, result, and validation evidence.
+- Reports requested model and reasoning effort for every worker attempt, distinguishing rejected attempts from executed work, with result and validation evidence.
 
 ## Install
 
@@ -31,6 +33,12 @@ Select a budget mode when needed:
 ```text
 $astra-sol-luna-orchestrator BUDGET_MODE=LOW_BUDGET Complete this project: <goal>
 ```
+
+## Model and usage behavior
+
+You do not need to select GPT-6 Astra to activate this Skill. If the main thread uses GPT-5.6 Sol and the client supports explicit per-worker model and reasoning-effort selection, it may call a bounded Astra worker at `medium` or lower while Sol remains responsible for orchestration and the final answer.
+
+Each subagent performs its own model and tool calls, so multi-agent runs consume more tokens than comparable single-agent runs. The Skill therefore delegates only bounded work whose speed, context isolation, or independent verification benefit justifies the additional usage.
 
 ## Upstream and redistribution note
 

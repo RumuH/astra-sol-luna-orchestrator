@@ -1,11 +1,13 @@
 ---
 name: astra-sol-luna-orchestrator
-description: "Orchestrate substantial project work from the main thread with dynamic GPT-5.6 Sol and GPT-5.6 Luna routing, budget-aware escalation, evidence-based review, and final integration. Use when the user asks for multi-model or subagent execution, an Astra-led project, parallel implementation/review, or sustained repository work that benefits from bounded workers."
+description: "Orchestrate substantial project work from the main thread with dynamic GPT-6 Astra, GPT-5.6 Sol, and GPT-5.6 Luna routing, cost-aware reasoning caps, evidence-based review, and final integration. Use when the user asks for multi-model or subagent execution, an Astra-led project, parallel implementation/review, or sustained repository work that benefits from bounded workers."
 ---
 
 # Astra–Sol–Luna Orchestrator
 
-Keep the user-facing conversation, project plan, architecture decisions, review, and final acceptance in the main thread. Prefer `gpt-6-astra` for that main thread when the current client can select it. Do not claim the current model is Astra unless the runtime exposes that fact; continue safely when it cannot be observed.
+Keep the user-facing conversation, project plan, architecture decisions, review, and final acceptance in the main thread. The Skill can run under any capable main-thread model; selecting `gpt-6-astra` is not a prerequisite. Prefer Astra for the main thread only when the user selected or requested it and the current client supports it. Do not claim the current model is Astra unless the runtime exposes that fact; continue safely when it cannot be observed.
+
+A Skill cannot retroactively change the model or reasoning effort already selected for the running main-thread turn. Apply the cost-aware worker caps in `routing.md` to every dispatch. If the main thread is Sol and explicit model and effort selection are supported by the spawn API, it may dispatch a bounded Astra consultation or review at no more than `medium` by default; Sol remains the orchestrator and final decision-maker.
 
 Use workers for bounded execution when delegation improves speed, context quality, or reliability. The main thread remains accountable for every accepted result.
 
@@ -19,16 +21,18 @@ Before routing work, read:
 Inspect the collaboration tool schema available in the current turn before spawning. Use only declared fields.
 
 - Current V2 schema: pass `model`, `reasoning_effort`, `task_name`, and `fork_turns: "none"` explicitly.
-- Legacy schema: use its declared context-isolation field, such as `fork_context: false`, and omit unsupported fields.
+- Legacy schema: use its declared context-isolation field, such as `fork_context: false`. Delegate only when both model and effort can be set explicitly or their inherited values are contractually guaranteed, observable, and compliant with the cost-aware cap; otherwise keep the task in the main thread.
 - Treat an actual spawn rejection as authoritative for model or effort availability.
 - Do not require a custom agent file when explicit spawn parameters are available.
+- Treat `gpt-6-astra` and `gpt-5.6-sol` as expensive models with an automatic reasoning ceiling of `medium`. Exceed that ceiling only when the user explicitly names the exact model and exact higher effort level for the current task.
+- `gpt-5.6-luna` may use `high` for a difficult but tightly bounded and strongly verifiable task; otherwise prefer `low` or `medium`.
 - Never silently substitute a different model or effort. Re-route only through the documented budget or failure policy and record the reason.
 
 ## Non-recursive topology
 
 Use a star topology:
 
-`main orchestrator -> Sol/Luna workers -> main review -> optional rework -> final integration`
+`main orchestrator -> Astra/Sol/Luna workers -> main review -> optional rework -> final integration`
 
 Enforce these defaults:
 
@@ -47,9 +51,9 @@ Keep architecture, security-critical decisions, destructive-operation decisions,
 ## Execution rules
 
 1. For a complex project, publish and maintain a compact plan containing `PROJECT GOAL`, `CONSTRAINTS`, `ARCHITECTURE`, `TASK GRAPH`, `DEPENDENCIES`, `RISK LEVEL`, `MODEL ASSIGNMENT`, and `ACCEPTANCE CRITERIA`.
-2. Route each READY task using the factors in `routing.md`, prioritizing verification quality over raw task size.
+2. Route each READY task using the factors and cost-aware reasoning ceilings in `routing.md`, prioritizing verification quality over raw task size.
 3. Give each worker exactly one bounded objective using the contract in `workflow.md`.
-4. Maintain the dispatch ledger defined in `workflow.md`. Record the explicit spawn model and reasoning effort for every attempt, including failures, retries, escalation, and downgrade.
+4. Maintain the dispatch ledger defined in `workflow.md`. Record requested model and effort for every attempt. For executed work, record accepted explicit values or contractually guaranteed, observable inherited values; label rejected spawn values as attempted and not used. Include failures, retries, escalation, and downgrade.
 5. Parallelize only independent tasks. With a shared checkout, give writing workers disjoint file ownership; otherwise serialize or isolate them.
 6. Inspect evidence yourself. A worker's completion statement is never acceptance.
 7. Rework, escalate, downgrade, or replan according to the failure cause—not merely because a worker failed once.
@@ -63,4 +67,4 @@ If no budget mode is specified, use `NORMAL`.
 
 ## Completion
 
-Return a single integrated report from the main thread using the final-report structure in `workflow.md`. Its `Agent usage` section must map every delegated subtask attempt to the worker model and reasoning effort recorded from the accepted spawn or follow-up request. Include validation evidence, not verbose agent transcripts or hidden reasoning.
+Return a single integrated report from the main thread using the final-report structure in `workflow.md`. Its `Agent usage` section must map every delegated subtask attempt to the requested model and reasoning effort. For executed work, use the accepted spawn or follow-up values; for a rejected spawn, label the requested values as attempted and not used. Include validation evidence, not verbose agent transcripts or hidden reasoning.

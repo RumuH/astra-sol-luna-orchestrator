@@ -27,8 +27,8 @@ The main orchestrator must keep a compact in-thread ledger for every worker exec
 | Attempt | Monotonically increasing attempt number for that task |
 | Objective | Short, user-comprehensible objective |
 | Task name | Exact spawned task name |
-| Model argument | Exact `model` passed in the accepted spawn or follow-up request, or a contractually guaranteed inherited value |
-| Effort argument | Exact `reasoning_effort` passed in the accepted spawn or follow-up request, or a contractually guaranteed inherited value |
+| Model argument | Requested `model`; for executed work, the value accepted by the spawn or follow-up request or a contractually guaranteed inherited value; for a rejected spawn, the attempted value labeled as not used |
+| Effort argument | Requested `reasoning_effort`; for executed work, the value accepted by the spawn or follow-up request or a contractually guaranteed inherited value; for a rejected spawn, the attempted value labeled as not used |
 | Dispatch outcome | `SPAWN_PENDING`, `LAUNCHED`, `SPAWN_FAILED`, `FOLLOWUP_SENT`, or `FOLLOWUP_FAILED` |
 | Attempt state | `RUNNING`, `RETURNED`, `ACCEPTED`, `REJECTED`, `FAILED`, or `INTERRUPTED` |
 | Review round | `0`, `1`, or `2` |
@@ -39,7 +39,7 @@ Create the row as `SPAWN_PENDING` before spawning. Change it to `LAUNCHED` and `
 
 Every retry, rework, escalation, downgrade, or follow-up gets a new attempt row linked by Task ID. Set `FOLLOWUP_SENT` only after the API accepts the follow-up. When a follow-up supplies explicit model or effort overrides, record those accepted arguments. When it omits either field, reuse the worker's accepted configuration only if the active API contract guarantees inheritance. If inheritance is not guaranteed, do not send that follow-up under exact-attribution reporting; spawn a new worker with explicit configuration instead. Apply the same resolved-configuration mismatch check when follow-up results expose resolved values. Logical task state moves to `RUNNING` after successful launch or follow-up, `REVIEW` after return, and `DONE` only after main-thread acceptance.
 
-The accepted explicit spawn or follow-up arguments, plus contractually guaranteed inherited fields, are authoritative for model and effort. Do not infer them from a task-name suffix or worker self-identification. Keep main-thread work separate; if its model cannot be observed, label it `main thread (model unverified)` rather than claiming Astra. Do not persist the ledger to repository files unless requested. Do not record secrets, full prompts, transcripts, agent/thread identifiers, absolute paths, hidden reasoning, raw chain of thought, or noisy logs.
+Prefer explicit model and effort on every dispatch. When the active schema cannot set both fields, delegate only if the API contract guarantees the inherited values, those values are observable, and they comply with `routing.md`; otherwise keep the task in the main thread. Accepted explicit spawn or follow-up arguments, plus qualifying inherited fields, are authoritative for executed work. Do not infer them from a task-name suffix or worker self-identification. Keep main-thread work separate; if its model cannot be observed, label it `main thread (model unverified)` rather than claiming Astra. Do not persist the ledger to repository files unless requested. Do not record secrets, full prompts, transcripts, agent/thread identifiers, absolute paths, hidden reasoning, raw chain of thought, or noisy logs.
 
 ## Worker contract
 
