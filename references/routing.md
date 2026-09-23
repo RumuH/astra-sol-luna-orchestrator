@@ -30,7 +30,7 @@ Task size alone does not choose Sol.
 
 ## Cost-aware reasoning policy
 
-For automatic routing, classify `gpt-6-astra` and `gpt-5.6-sol` as expensive models and `gpt-5.6-luna` as the cost-efficient model.
+For automatic worker routing, classify `gpt-6-astra` and `gpt-5.6-sol` as expensive models and `gpt-5.6-luna` as the cost-efficient model. These ceilings apply only to workers the Skill dispatches automatically. They do not restrict the model or effort the user selects for the main thread.
 
 - Astra default: `medium` for bounded architecture consultation or high-risk review; use `low` for a simpler focused check. Automatic ceiling: `medium`.
 - Sol default: `medium`; use `low` when the task is straightforward. Automatic ceiling: `medium`.
@@ -39,7 +39,7 @@ For automatic routing, classify `gpt-6-astra` and `gpt-5.6-sol` as expensive mod
 - Never select `xhigh`, `max`, or `ultra` automatically for Luna.
 - Prefer explicitly passing the selected model and effort on every spawn. Use guaranteed inherited values only under the legacy compatibility exception in `SKILL.md`. Give task names a stable suffix such as `_luna_low`, `_luna_medium`, `_luna_high`, `_sol_medium`, or `_astra_medium` that matches the actual configuration.
 
-The Skill cannot lower or replace the model or effort of a main-thread turn that is already running. The UI, CLI, or applicable `config.toml` selects that value before Skill instructions execute. When the active main-thread setting is observable and violates the default ceiling without an explicit user override, do not compound the cost with high-effort expensive workers; report the mismatch and recommend changing the session or configuration for the next turn.
+The Skill cannot lower or replace the model or effort of a main-thread turn that is already running, and it must not modify persistent configuration to try to do so. The user's UI, CLI, or saved preference selects the main-thread value before Skill instructions execute. Accept that selection without treating it as a policy violation. Apply the ceiling only to worker dispatches initiated by the Skill.
 
 ## Main-thread model and cross-model dispatch
 

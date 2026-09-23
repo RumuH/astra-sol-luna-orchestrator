@@ -38,6 +38,8 @@ $astra-sol-luna-orchestrator BUDGET_MODE=LOW_BUDGET Complete this project: <goal
 
 You do not need to select GPT-6 Astra to activate this Skill. If the main thread uses GPT-5.6 Sol and the client supports explicit per-worker model and reasoning-effort selection, it may call a bounded Astra worker at `medium` or lower while Sol remains responsible for orchestration and the final answer.
 
+Reasoning limits are applied only to individual worker dispatches. The Skill never edits user or project configuration to pin the main-thread model or reasoning effort, so users remain free to choose any available reasoning level when starting a conversation.
+
 Each subagent performs its own model and tool calls, so multi-agent runs consume more tokens than comparable single-agent runs. The Skill therefore delegates only bounded work whose speed, context isolation, or independent verification benefit justifies the additional usage.
 
 ## Upstream and redistribution note

@@ -22,6 +22,8 @@ Inspect the collaboration tool schema available in the current turn before spawn
 
 - Current V2 schema: pass `model`, `reasoning_effort`, `task_name`, and `fork_turns: "none"` explicitly.
 - Legacy schema: use its declared context-isolation field, such as `fork_context: false`. Delegate only when both model and effort can be set explicitly or their inherited values are contractually guaranteed, observable, and compliant with the cost-aware cap; otherwise keep the task in the main thread.
+- Enforce cost-aware worker limits only through per-dispatch `model` and `reasoning_effort` arguments. Never add, remove, or change persistent model or reasoning settings in user or project `config.toml`, `models.new_thread`, custom-agent files, profiles, managed settings, or UI preferences to enforce this Skill.
+- Treat the user's selected main-thread model and reasoning effort as authoritative, including `high`, `xhigh`, `max`, or `ultra`. Worker routing caps do not constrain the user's main-thread selection.
 - Treat an actual spawn rejection as authoritative for model or effort availability.
 - Do not require a custom agent file when explicit spawn parameters are available.
 - Treat `gpt-6-astra` and `gpt-5.6-sol` as expensive models with an automatic reasoning ceiling of `medium`. Exceed that ceiling only when the user explicitly names the exact model and exact higher effort level for the current task.
